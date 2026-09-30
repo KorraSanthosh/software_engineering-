@@ -1,0 +1,109 @@
+/* ==========================================================
+   Design tokens — "newsprint" editorial theme
+   ========================================================== */
+:root {
+  --paper: #f6f2e8;
+  --paper-2: #efe9db;
+  --card: #fffdf8;
+  --ink: #16140f;
+  --ink-2: #3b372e;
+  --ink-3: #6b655a;
+  --ink-4: #9a9385;
+  --rule: #d8d0bd;
+  --rule-strong: #16140f;
+  --accent: #a4161a;        /* press red */
+  --accent-soft: #f4dcd9;
+  --blue: #1d4e89;
+  --blue-soft: #dce6f3;
+  --green: #2d6a4f;
+  --green-soft: #dcefe4;
+  --amber: #9a6700;
+  --amber-soft: #f7ebcc;
+
+  --font-mast: 'UnifrakturMaguntia', 'Old English Text MT', serif;
+  --font-head: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-ui: 'Libre Franklin', 'Franklin Gothic Medium', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+
+  --radius: 2px;
+  --shadow: 0 1px 0 rgba(22, 20, 15, 0.06), 0 8px 24px -12px rgba(22, 20, 15, 0.18);
+  --page-max: 1320px;
+  --gutter: 28px;
+
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* faint paper grain */
+  background-image:
+    radial-gradient(rgba(22, 20, 15, 0.025) 1px, transparent 1px);
+  background-size: 3px 3px;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-head);
+  color: var(--ink);
+  margin: 0;
+  line-height: 1.15;
+}
+
+a {
+  color: inherit;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+::selection {
+  background: var(--accent);
+  color: #fff;
+}
+
+.num,
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.muted {
+  color: var(--ink-3);
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  :root {
+    --gutter: 16px;
+  }
+}
