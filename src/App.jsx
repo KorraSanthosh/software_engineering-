@@ -23,11 +23,13 @@ import Billing from './pages/Billing'
 import Payments from './pages/Payments'
 import NotFound from './pages/NotFound'
 import PaymentVerification from './pages/manager/PaymentVerification'
+import UserManagement from './pages/manager/UserManagement'
 import DeliveryPortal from './pages/delivery/DeliveryPortal'
 import CustomerPortal from './pages/customer/CustomerPortal'
 import MyOverdue from './pages/customer/MyOverdue'
 import MyVacationHolds from './pages/customer/MyVacationHolds'
 import MyPaymentRequests from './pages/customer/MyPaymentRequests'
+import Settings from './pages/Settings'
 
 const MANAGER_SECTIONS = [
   { to: '/', label: 'Front Page', icon: 'front', end: true },
@@ -40,6 +42,7 @@ const MANAGER_SECTIONS = [
   { to: '/billing', label: 'Billing', icon: 'receipt' },
   { to: '/payments', label: 'Payments', icon: 'wallet' },
   { to: '/payment-requests', label: 'Payment Requests', icon: 'check' },
+  { to: '/users', label: 'Users', icon: 'users' },
 ]
 
 const DELIVERY_SECTIONS = [
@@ -137,6 +140,7 @@ function AppShell() {
               <Icon name="users" size={13} />
               <span>{user?.DisplayName || user?.Username}</span>
               <RoleLabel role={user?.Role} />
+              <Link to="/settings" className="logout-btn" style={{ marginRight: '8px' }}>Settings</Link>
               <button className="logout-btn" onClick={logout}>Sign Out</button>
             </div>
             <span className="hide-sm">Routes · Subscriptions · Holds · Invoices · Receipts</span>
@@ -157,6 +161,7 @@ function AppShell() {
 
         <main className="page">
           <Routes>
+            <Route path="/settings" element={<Settings />} />
             {/* Manager routes */}
             <Route path="/" element={<ProtectedRoute roles={['manager']}><Dashboard /></ProtectedRoute>} />
             <Route path="/customers" element={<ProtectedRoute roles={['manager']}><Customers /></ProtectedRoute>} />
@@ -168,6 +173,7 @@ function AppShell() {
             <Route path="/billing" element={<ProtectedRoute roles={['manager']}><Billing /></ProtectedRoute>} />
             <Route path="/payments" element={<ProtectedRoute roles={['manager']}><Payments /></ProtectedRoute>} />
             <Route path="/payment-requests" element={<ProtectedRoute roles={['manager']}><PaymentVerification /></ProtectedRoute>} />
+            <Route path="/users" element={<ProtectedRoute roles={['manager']}><UserManagement /></ProtectedRoute>} />
 
             {/* Delivery staff routes */}
             <Route path="/my-deliveries" element={<ProtectedRoute roles={['delivery_staff']}><DeliveryPortal /></ProtectedRoute>} />

@@ -41,11 +41,11 @@ export default function MyVacationHolds() {
 
   const columns = [
     { key: 'HoldID', label: '#', sortable: true },
-    { key: 'StartDate', label: 'From', render: (_, r) => date(r.StartDate), sortable: true },
-    { key: 'EndDate', label: 'To', render: (_, r) => date(r.EndDate), sortable: true },
+    { key: 'StartDate', label: 'From', render: (r) => date(r.StartDate), sortable: true },
+    { key: 'EndDate', label: 'To', render: (r) => date(r.EndDate), sortable: true },
     {
       key: 'Duration', label: 'Days',
-      render: (_, r) => {
+      render: (r) => {
         const d = daysBetween(r.StartDate, r.EndDate)
         return d !== null ? d + 1 : '—'
       },
@@ -53,7 +53,7 @@ export default function MyVacationHolds() {
     },
     {
       key: 'Status', label: 'Status',
-      render: (_, r) => {
+      render: (r) => {
         const s = holdStatus(r)
         return <Badge tone={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</Badge>
       },

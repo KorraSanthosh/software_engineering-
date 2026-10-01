@@ -16,11 +16,11 @@ export default function MyOverdue() {
 
   const columns = [
     { key: 'InvoiceID', label: '#', sortable: true },
-    { key: 'BillingMonth', label: 'Billing Month', render: (_, r) => date(r.BillingMonth, { month: 'short', year: 'numeric' }), sortable: true },
-    { key: 'TotalAmount', label: 'Amount', render: (_, r) => money(r.TotalAmount), align: 'right', sortable: true },
-    { key: 'AmountPaid', label: 'Paid', render: (_, r) => money(r.AmountPaid), align: 'right' },
-    { key: 'Balance', label: 'Balance', render: (_, r) => <strong style={{color: 'var(--accent)'}}>{money(r.Balance)}</strong>, align: 'right', sortable: true },
-    { key: 'PaymentStatus', label: 'Status', render: (_, r) => <Badge tone={r.PaymentStatus?.toLowerCase()}>{r.PaymentStatus}</Badge> },
+    { key: 'BillingMonth', label: 'Billing Month', render: (r) => date(r.BillingMonth, { month: 'short', year: 'numeric' }), sortable: true },
+    { key: 'TotalAmount', label: 'Amount', render: (r) => money(r.TotalAmount), align: 'right', sortable: true },
+    { key: 'AmountPaid', label: 'Paid', render: (r) => money(r.AmountPaid), align: 'right' },
+    { key: 'Balance', label: 'Balance', render: (r) => <strong style={{color: 'var(--accent)'}}>{money(r.Balance)}</strong>, align: 'right', sortable: true },
+    { key: 'PaymentStatus', label: 'Status', render: (r) => <Badge tone={r.PaymentStatus?.toLowerCase()}>{r.PaymentStatus}</Badge> },
     { key: 'DaysOutstanding', label: 'Days', sortable: true, align: 'right' },
   ]
 

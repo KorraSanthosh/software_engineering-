@@ -45,19 +45,19 @@ export default function PaymentVerification() {
   const columns = [
     { key: 'RequestID', label: '#', sortable: true },
     { key: 'CustomerName', label: 'Customer', sortable: true },
-    { key: 'Amount', label: 'Amount', render: (_, r) => <strong>{money(r.Amount)}</strong>, align: 'right', sortable: true },
+    { key: 'Amount', label: 'Amount', render: (r) => <strong>{money(r.Amount)}</strong>, align: 'right', sortable: true },
     { key: 'ReferenceNumber', label: 'Reference #', sortable: true,
-      render: (_, r) => <code style={{fontFamily: 'var(--font-mono)', fontSize: '0.85rem', background: 'var(--paper-2)', padding: '0.15rem 0.4rem', borderRadius: '3px'}}>{r.ReferenceNumber}</code>
+      render: (r) => <code style={{fontFamily: 'var(--font-mono)', fontSize: '0.85rem', background: 'var(--paper-2)', padding: '0.15rem 0.4rem', borderRadius: '3px'}}>{r.ReferenceNumber}</code>
     },
     {
       key: 'Status', label: 'Status',
-      render: (_, r) => <Badge tone={STATUS_TONE[r.Status]}>{r.Status.charAt(0).toUpperCase() + r.Status.slice(1)}</Badge>,
+      render: (r) => <Badge tone={STATUS_TONE[r.Status]}>{r.Status.charAt(0).toUpperCase() + r.Status.slice(1)}</Badge>,
       sortable: true,
     },
-    { key: 'CreatedAt', label: 'Submitted', render: (_, r) => date(r.CreatedAt), sortable: true },
+    { key: 'CreatedAt', label: 'Submitted', render: (r) => date(r.CreatedAt), sortable: true },
     {
       key: 'actions', label: 'Actions',
-      render: (_, r) => r.Status === 'pending' ? (
+      render: (r) => r.Status === 'pending' ? (
         <button className="btn btn-sm btn-primary" onClick={(e) => { e.stopPropagation(); setSelected(r); setAction(null); setNote('') }}>
           <Icon name="eye" size={13} /> Review
         </button>

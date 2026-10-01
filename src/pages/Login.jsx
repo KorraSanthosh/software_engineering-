@@ -8,6 +8,7 @@ import { VintageFlourish } from '../components/Ornaments'
 export default function Login() {
   const { login, loading } = useAuth()
   const navigate = useNavigate()
+  const [selectedRole, setSelectedRole] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -17,6 +18,9 @@ export default function Login() {
     setError('')
     try {
       const user = await login(username, password)
+      if (user.Role !== selectedRole) {
+        throw new Error(`Invalid role. This account is not a ${selectedRole.replace('_', ' ')}.`)
+      }
       if (user.Role === 'manager') navigate('/', { replace: true })
       else if (user.Role === 'delivery_staff') navigate('/my-deliveries', { replace: true })
       else if (user.Role === 'customer') navigate('/my-account', { replace: true })
@@ -37,62 +41,70 @@ export default function Login() {
           <p className="login-tagline">Circulation · Delivery · Billing</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="login-form">
-          <h2 className="login-heading">Sign In to Your Desk</h2>
-
-          {error && (
-            <div className="login-error">
-              <Icon name="alert" size={14} /> {error}
+        {!selectedRole ? (
+          <div className="login-roles-container">
+            <h2 className="login-heading" style={{ textAlign: 'center', marginBottom: '1.5rem' }}>Select Your Role</h2>
+            <div className="login-roles">
+              <div className="login-role-card" onClick={() => setSelectedRole('manager')} style={{ cursor: 'pointer' }}>
+                <Icon name="front" size={20} />
+                <strong>Manager</strong>
+                <span>Full agency access</span>
+              </div>
+              <div className="login-role-card" onClick={() => setSelectedRole('delivery_staff')} style={{ cursor: 'pointer' }}>
+                <Icon name="truck" size={20} />
+                <strong>Delivery Staff</strong>
+                <span>Daily route sheet</span>
+              </div>
+              <div className="login-role-card" onClick={() => setSelectedRole('customer')} style={{ cursor: 'pointer' }}>
+                <Icon name="users" size={20} />
+                <strong>Customer</strong>
+                <span>Account & payments</span>
+              </div>
             </div>
-          )}
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="login-form">
+            <h2 className="login-heading">Sign In ({selectedRole.replace('_', ' ')})</h2>
 
-          <div className="login-field">
-            <label htmlFor="username">Username</label>
-            <input
-              id="username"
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Enter your username"
-              autoFocus
-              required
-            />
-          </div>
+            {error && (
+              <div className="login-error">
+                <Icon name="alert" size={14} /> {error}
+              </div>
+            )}
 
-          <div className="login-field">
-            <label htmlFor="password">Password</label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
-              required
-            />
-          </div>
+            <div className="login-field">
+              <label htmlFor="username">Username</label>
+              <input
+                id="username"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Enter your username"
+                autoFocus
+                required
+              />
+            </div>
 
-          <button type="submit" className="login-btn" disabled={loading}>
-            {loading ? 'Signing in…' : 'Enter the Newsroom'}
-          </button>
-        </form>
+            <div className="login-field">
+              <label htmlFor="password">Password</label>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+                required
+              />
+            </div>
 
-        <div className="login-roles">
-          <div className="login-role-card">
-            <Icon name="front" size={20} />
-            <strong>Manager</strong>
-            <span>Full agency access</span>
-          </div>
-          <div className="login-role-card">
-            <Icon name="truck" size={20} />
-            <strong>Delivery Staff</strong>
-            <span>Daily route sheet</span>
-          </div>
-          <div className="login-role-card">
-            <Icon name="users" size={20} />
-            <strong>Customer</strong>
-            <span>Account & payments</span>
-          </div>
-        </div>
+            <button type="submit" className="login-btn" disabled={loading}>
+              {loading ? 'Signing in…' : 'Enter the Newsroom'}
+            </button>
+            <button type="button" className="login-btn" onClick={() => { setSelectedRole(null); setError(''); }} style={{ marginTop: '0.5rem', background: '#e0e0e0', color: '#333' }}>
+              Back to roles
+            </button>
+          </form>
+        )}
       </div>
     </div>
   )

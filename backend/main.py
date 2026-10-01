@@ -28,11 +28,12 @@ from __future__ import annotations
 
 import datetime as dt
 import os
+import random
 from collections import defaultdict
 from contextlib import asynccontextmanager
 from typing import List, Literal, Optional
 
-from fastapi import APIRouter, FastAPI, HTTPException, Path, Query
+from fastapi import APIRouter, Depends, FastAPI, HTTPException, Path, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from pydantic import AliasChoices, BaseModel, ConfigDict, Field
@@ -259,6 +260,15 @@ class PaymentVerificationAction(_In):
     status: Literal["accepted", "rejected"] = Field(validation_alias=A("Status", "status"))
     note: Optional[str] = Field("", max_length=500, validation_alias=A("Note", "note", "ManagerNote", "managerNote"))
 
+class OTPRequest(_In):
+    new_username: str = Field(min_length=3, max_length=50)
+
+class ChangeCredentialsRequest(_In):
+    new_username: str = Field(min_length=3, max_length=50)
+    new_password: str = Field(min_length=6)
+    otp: str
+
+OTP_STORE = {}
 
 # ===========================================================================
 # Health
@@ -337,6 +347,51 @@ async def register_user(req: RegisterUserRequest, user: dict = Depends(require_r
     return {"message": "User created", **doc}
 
 
+@api.get("/auth/users")
+async def list_users(user: dict = Depends(require_role("manager"))):
+    users = await find("Users", sort=[("Username", 1)])
+    for u in users:
+        u.pop("PasswordHash", None)
+    return users
+
+
+@api.post("/auth/request-otp")
+async def request_otp(req: OTPRequest, user: dict = Depends(get_current_user)):
+    existing = await db.Users.find_one({"Username": req.new_username})
+    if existing and existing["UserID"] != user["UserID"]:
+        raise HTTPException(409, "Username is already taken.")
+    
+    code = str(random.randint(100000, 999999))
+    OTP_STORE[user["UserID"]] = {
+        "otp": code,
+        "expires": dt.datetime.utcnow() + dt.timedelta(minutes=10),
+        "new_username": req.new_username
+    }
+    print(f"OTP for user {user['UserID']} ({user['Username']}): {code}")
+    return {"message": "OTP sent to your registered mobile/email."}
+
+
+@api.post("/auth/change-credentials")
+async def change_credentials(req: ChangeCredentialsRequest, user: dict = Depends(get_current_user)):
+    user_id = user["UserID"]
+    stored = OTP_STORE.get(user_id)
+    if not stored:
+        raise HTTPException(400, "No active OTP request.")
+    if dt.datetime.utcnow() > stored["expires"]:
+        del OTP_STORE[user_id]
+        raise HTTPException(400, "OTP expired.")
+    if req.otp != stored["otp"] or req.new_username != stored["new_username"]:
+        raise HTTPException(400, "Invalid OTP or username.")
+    
+    await db.Users.update_one(
+        {"UserID": user_id},
+        {"$set": {
+            "Username": req.new_username,
+            "PasswordHash": hash_password(req.new_password)
+        }}
+    )
+    del OTP_STORE[user_id]
+    return {"message": "Credentials updated successfully."}
 # ===========================================================================
 # Delivery persons
 # ===========================================================================

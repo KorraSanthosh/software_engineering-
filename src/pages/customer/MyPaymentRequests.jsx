@@ -58,15 +58,15 @@ export default function MyPaymentRequests() {
 
   const columns = [
     { key: 'RequestID', label: '#', sortable: true },
-    { key: 'Amount', label: 'Amount', render: (_, r) => money(r.Amount), align: 'right', sortable: true },
+    { key: 'Amount', label: 'Amount', render: (r) => money(r.Amount), align: 'right', sortable: true },
     { key: 'ReferenceNumber', label: 'Ref. Number', sortable: true },
     {
       key: 'Status', label: 'Status',
-      render: (_, r) => <Badge tone={STATUS_TONE[r.Status]}>{r.Status.charAt(0).toUpperCase() + r.Status.slice(1)}</Badge>,
+      render: (r) => <Badge tone={STATUS_TONE[r.Status]}>{r.Status.charAt(0).toUpperCase() + r.Status.slice(1)}</Badge>,
       sortable: true,
     },
-    { key: 'ManagerNote', label: 'Manager Note', render: (_, r) => r.ManagerNote || '—' },
-    { key: 'CreatedAt', label: 'Submitted', render: (_, r) => date(r.CreatedAt), sortable: true },
+    { key: 'ManagerNote', label: 'Manager Note', render: (r) => r.ManagerNote || '—' },
+    { key: 'CreatedAt', label: 'Submitted', render: (r) => date(r.CreatedAt), sortable: true },
   ]
 
   return (

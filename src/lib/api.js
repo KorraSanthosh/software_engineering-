@@ -128,4 +128,14 @@ export const api = {
     list: (params) => request('/payment-requests', { params }),
     review: (id, body) => request(`/payment-requests/${id}`, { method: 'PUT', body }),
   },
+
+  auth: {
+    requestOtp: (body) => request('/auth/request-otp', { method: 'POST', body }),
+    changeCredentials: (body) => request('/auth/change-credentials', { method: 'POST', body }),
+  },
+
+  users: {
+    list: () => request('/auth/users'),
+    register: (body) => request('/auth/register', { method: 'POST', body }),
+  },
 }
