@@ -1,0 +1,112 @@
+/* ==========================================================
+   Design tokens — Vintage Broadsheet Newspaper Theme
+   Inspired by classic Victorian and 20th-century newsprint
+   ========================================================== */
+:root {
+  --paper-backdrop: #eae3d2;
+  --paper: #fbf8f1;
+  --paper-2: #f2ebd9;
+  --card: #ffffff;
+  --ink: #110f0c;
+  --ink-2: #2c2820;
+  --ink-3: #585243;
+  --ink-4: #8a8270;
+  --rule: #ded6c2;
+  --rule-strong: #110f0c;
+  --accent: #a4161a;        /* press red */
+  --accent-soft: #f9e6e4;
+  --blue: #1d4e89;
+  --blue-soft: #e2eaf5;
+  --green: #1b5e20;
+  --green-soft: #e2f2e5;
+  --amber: #995c00;
+  --amber-soft: #fbf1db;
+
+  --font-mast: 'UnifrakturMaguntia', 'Old English Text MT', serif;
+  --font-banner: 'Cinzel', 'Playfair Display', Georgia, serif;
+  --font-head: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-ui: 'Libre Franklin', 'Franklin Gothic Medium', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+
+  --radius: 1px;
+  --shadow: 2px 2px 0 rgba(17, 15, 12, 0.12), 0 8px 24px -12px rgba(17, 15, 12, 0.15);
+  --page-max: 1280px;
+  --gutter: 28px;
+
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--paper-backdrop);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* Authentic subtle newsprint grain */
+  background-image:
+    radial-gradient(rgba(17, 15, 12, 0.04) 1px, transparent 1px);
+  background-size: 4px 4px;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-head);
+  color: var(--ink);
+  margin: 0;
+  line-height: 1.15;
+}
+
+a {
+  color: inherit;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+::selection {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.num,
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.muted {
+  color: var(--ink-3);
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  :root {
+    --gutter: 14px;
+  }
+}
