@@ -252,7 +252,7 @@ export function DataTable({ columns, rows, rowKey, onRowClick, pageSize = 15, em
         <tbody>
           {slice.map((r, i) => (
             <tr
-              key={rowKey ? rowKey(r) : i}
+              key={rowKey ? (typeof rowKey === 'function' ? rowKey(r) : r[rowKey]) : i}
               className={onRowClick ? 'clickable' : undefined}
               onClick={onRowClick ? () => onRowClick(r) : undefined}
             >
