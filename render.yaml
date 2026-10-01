@@ -18,7 +18,6 @@ services:
   - type: web
     name: newspaper-agency-frontend
     env: static
-    plan: free
     rootDir: .
     buildCommand: "npm install && npm run build"
     staticPublishPath: "./dist"
