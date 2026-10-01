@@ -17,7 +17,13 @@ async function request(path, { method = 'GET', body, params } = {}) {
   try {
     res = await fetch(url, {
       method,
-      headers: body !== undefined ? { 'Content-Type': 'application/json' } : undefined,
+      headers: (() => {
+        const h = {}
+        if (body !== undefined) h['Content-Type'] = 'application/json'
+        const tk = localStorage.getItem('na_token')
+        if (tk) h['Authorization'] = `Bearer ${tk}`
+        return Object.keys(h).length ? h : undefined
+      })(),
       body: body !== undefined ? JSON.stringify(body) : undefined,
     })
   } catch {
@@ -98,5 +104,28 @@ export const api = {
       return r?.commissions ?? []
     },
     summary: (year, month) => request('/reports/agency-summary', { params: { year, month } }),
+  },
+
+  // === Customer self-service ===
+  me: {
+    overdue: () => request('/me/overdue'),
+    subscriptions: () => request('/me/subscriptions'),
+    vacationHolds: () => request('/me/vacation-holds'),
+    createVacationHold: (body) => request('/me/vacation-holds', { method: 'POST', body }),
+    paymentRequests: () => request('/me/payment-requests'),
+    createPaymentRequest: (body) => request('/me/payment-requests', { method: 'POST', body }),
+  },
+
+  // === Delivery staff self-service ===
+  myDeliveries: {
+    list: (params) => request('/my-deliveries', { params }),
+    setStatus: (ids, status) =>
+      request('/my-deliveries/batch-update', { method: 'PUT', body: { updates: ids.map((deliveryId) => ({ deliveryId, status })) } }),
+  },
+
+  // === Payment verification (manager) ===
+  paymentRequests: {
+    list: (params) => request('/payment-requests', { params }),
+    review: (id, body) => request(`/payment-requests/${id}`, { method: 'PUT', body }),
   },
 }
