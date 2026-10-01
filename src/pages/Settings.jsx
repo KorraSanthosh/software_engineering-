@@ -17,6 +17,7 @@ export default function Settings() {
     try {
       const res = await api.auth.requestOtp({ new_username: form.new_username })
       toast(res.message || 'OTP sent')
+      if (res.dev_otp) alert(`📱 [MOCK SMS] You received OTP: ${res.dev_otp}`)
       setStep(2)
     } catch (e) {
       toast(e.message || 'Failed to request OTP', 'error')

@@ -378,7 +378,7 @@ async def request_delete_otp(req: DeleteUserOTPRequest, manager: dict = Depends(
     }
     # Simulate sending SMS
     print(f"\n[SMS SENT TO {phone}] (Account Deletion OTP): {code}\n")
-    return {"message": f"OTP sent to user's mobile number: {phone}"}
+    return {"message": f"OTP sent to user's mobile number: {phone}", "dev_otp": code}
 
 @api.delete("/auth/users/{user_id}")
 async def delete_user(user_id: int, otp: str = Query(...), manager: dict = Depends(require_role("manager"))):
@@ -415,7 +415,7 @@ async def request_otp(req: OTPRequest, user: dict = Depends(get_current_user)):
     }
     # Simulate sending SMS
     print(f"\n[SMS SENT TO {phone}] (Change Credentials OTP): {code}\n")
-    return {"message": f"OTP sent to your registered mobile number: {phone}"}
+    return {"message": f"OTP sent to your registered mobile number: {phone}", "dev_otp": code}
 
 
 @api.post("/auth/change-credentials")

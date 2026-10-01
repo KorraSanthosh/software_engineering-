@@ -66,6 +66,7 @@ export default function UserManagement() {
     try {
       const res = await api.users.requestDeleteOtp({ user_id: user.UserID })
       toast(res.message || 'OTP sent to user.')
+      if (res.dev_otp) alert(`📱 [MOCK SMS] User ${user.Username} received OTP: ${res.dev_otp}`)
       setDeleteStep(2)
     } catch (e) {
       toast(e.message || 'Failed to request delete OTP', 'error')
