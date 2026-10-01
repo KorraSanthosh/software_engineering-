@@ -95,16 +95,51 @@ async def seed_users(db) -> None:
     if await db.Users.count_documents({}) > 0:
         return
     
-    defaults = [
-        {"UserID": 1, "Username": "manager", "PasswordHash": hash_password("admin123"), "Role": "manager", "LinkedID": None, "DisplayName": "Agency Manager", "Phone": "9999999999", "CreatedAt": dt.datetime.utcnow()},
-        {"UserID": 2, "Username": "delivery1", "PasswordHash": hash_password("deliver123"), "Role": "delivery_staff", "LinkedID": 1, "DisplayName": "Delivery Person 1", "Phone": "9876543210", "CreatedAt": dt.datetime.utcnow()},
-        {"UserID": 3, "Username": "delivery2", "PasswordHash": hash_password("deliver123"), "Role": "delivery_staff", "LinkedID": 2, "DisplayName": "Delivery Person 2", "Phone": "9876543211", "CreatedAt": dt.datetime.utcnow()},
-        {"UserID": 4, "Username": "customer1", "PasswordHash": hash_password("customer123"), "Role": "customer", "LinkedID": 1, "DisplayName": "Customer 1", "Phone": "9876543212", "CreatedAt": dt.datetime.utcnow()},
-        {"UserID": 5, "Username": "customer2", "PasswordHash": hash_password("customer123"), "Role": "customer", "LinkedID": 2, "DisplayName": "Customer 2", "Phone": "9876543213", "CreatedAt": dt.datetime.utcnow()},
-    ]
+    defaults = []
+    defaults.append({
+        "UserID": 1,
+        "Username": "Manager",
+        "PasswordHash": hash_password("6302318692"),
+        "Role": "manager",
+        "LinkedID": None,
+        "DisplayName": "Agency Manager",
+        "Phone": "6302318692",
+        "CreatedAt": dt.datetime.utcnow()
+    })
+    
+    delivery_persons = await db.Delivery_Persons.find().to_list(100)
+    user_id_seq = 2
+    for dp in delivery_persons:
+        first_name = dp["Name"].split(" ")[0]
+        defaults.append({
+            "UserID": user_id_seq,
+            "Username": first_name,
+            "PasswordHash": hash_password(f"{first_name}@123"),
+            "Role": "delivery_staff",
+            "LinkedID": dp["DeliveryPersonID"],
+            "DisplayName": dp["Name"],
+            "Phone": str(dp.get("ContactNumber", "9999999999")),
+            "CreatedAt": dt.datetime.utcnow()
+        })
+        user_id_seq += 1
+        
+    customers = await db.Customers.find().to_list(5)
+    for c in customers:
+        first_name = c["Name"].split(" ")[0]
+        defaults.append({
+            "UserID": user_id_seq,
+            "Username": first_name,
+            "PasswordHash": hash_password(f"{first_name}@123"),
+            "Role": "customer",
+            "LinkedID": c["CustomerID"],
+            "DisplayName": c["Name"],
+            "Phone": "9999999999",
+            "CreatedAt": dt.datetime.utcnow()
+        })
+        user_id_seq += 1
+        
     await db.Users.insert_many(defaults)
     await db.Users.create_index("Username", unique=True)
     await db.Users.create_index("UserID", unique=True)
-    # Sync counter
-    await db.Counters.update_one({"_id": "Users"}, {"$set": {"seq": len(defaults)}}, upsert=True)
-    print(f"[auth] Seeded {len(defaults)} default user accounts")
+    await db.Counters.update_one({"_id": "Users"}, {"$set": {"seq": user_id_seq - 1}}, upsert=True)
+    print(f"[auth] Seeded {len(defaults)} dynamic default user accounts")
