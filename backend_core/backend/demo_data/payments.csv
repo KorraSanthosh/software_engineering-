@@ -1,0 +1,7 @@
+PaymentID,CustomerID,AmountPaid,PaymentDate,Method,ReferenceNumber
+1,1,600.00,2025-02-15,Cash,
+2,2,660.00,2025-02-20,Cheque,CHQ-2025-001
+3,3,540.00,2025-03-01,Cash,
+4,5,660.00,2025-02-28,Cash,
+5,7,960.00,2025-03-05,Cheque,CHQ-2025-002
+6,10,660.00,2025-03-10,Cash,
