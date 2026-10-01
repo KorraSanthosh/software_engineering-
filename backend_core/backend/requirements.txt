@@ -1,0 +1,4 @@
+fastapi>=0.110
+uvicorn[standard]>=0.29
+motor>=3.3            # async MongoDB driver (installs pymongo)
+openpyxl>=3.1         # only for importing .xlsx datasets
