@@ -1,0 +1,29 @@
+services:
+  # 1. The FastAPI Backend
+  - type: web
+    name: newspaper-agency-backend
+    env: python
+    rootDir: backend
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "uvicorn main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: MONGO_URL
+        # We set sync to false so Render will prompt you for this secure credential in the dashboard!
+        sync: false
+      - key: MONGO_DB
+        value: newspaper
+
+  # 2. The Vite React Frontend
+  - type: web
+    name: newspaper-agency-frontend
+    env: static
+    rootDir: .
+    buildCommand: "npm install && npm run build"
+    staticPublishPath: "./dist"
+    envVars:
+      - key: VITE_API_URL
+        # This magically links the frontend to the backend's live Render URL!
+        fromService:
+          type: web
+          name: newspaper-agency-backend
+          envVarKey: RENDER_EXTERNAL_URL
