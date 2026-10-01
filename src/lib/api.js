@@ -137,5 +137,7 @@ export const api = {
   users: {
     list: () => request('/auth/users'),
     register: (body) => request('/auth/register', { method: 'POST', body }),
+    requestDeleteOtp: (body) => request('/auth/request-delete-otp', { method: 'POST', body }),
+    delete: (userId, otp) => request(`/auth/users/${userId}?otp=${encodeURIComponent(otp)}`, { method: 'DELETE' }),
   },
 }

@@ -250,6 +250,7 @@ class RegisterUserRequest(_In):
     role: Literal["manager", "delivery_staff", "customer"] = Field(validation_alias=A("Role", "role"))
     linked_id: Optional[int] = Field(None, validation_alias=A("LinkedID", "linkedId", "linked_id"))
     display_name: str = Field(min_length=1, max_length=100, validation_alias=A("DisplayName", "displayName", "display_name"))
+    phone: str = Field(pattern=r"^(\+91[\-\s]?)?[6789]\d{9}$", validation_alias=A("Phone", "phone"), description="Indian mobile number")
 
 class PaymentVerificationRequest(_In):
     customer_id: int = Field(validation_alias=A("CustomerID", "customerId", "customer_id"))
@@ -341,6 +342,7 @@ async def register_user(req: RegisterUserRequest, user: dict = Depends(require_r
         "Role": req.role,
         "LinkedID": req.linked_id,
         "DisplayName": req.display_name.strip(),
+        "Phone": req.phone,
         "CreatedAt": dt.datetime.utcnow(),
     })
     del doc["PasswordHash"]
@@ -355,11 +357,55 @@ async def list_users(user: dict = Depends(require_role("manager"))):
     return users
 
 
+DELETE_OTP_STORE = {}
+
+class DeleteUserOTPRequest(_In):
+    user_id: int = Field(validation_alias=A("UserID", "userId", "user_id"))
+
+@api.post("/auth/request-delete-otp")
+async def request_delete_otp(req: DeleteUserOTPRequest, manager: dict = Depends(require_role("manager"))):
+    user = await db.Users.find_one({"UserID": req.user_id})
+    if not user:
+        raise HTTPException(404, "User not found")
+    phone = user.get("Phone")
+    if not phone:
+        raise HTTPException(400, "User has no phone number to receive OTP.")
+    
+    code = str(random.randint(100000, 999999))
+    DELETE_OTP_STORE[req.user_id] = {
+        "otp": code,
+        "expires": dt.datetime.utcnow() + dt.timedelta(minutes=10)
+    }
+    # Simulate sending SMS
+    print(f"\n[SMS SENT TO {phone}] (Account Deletion OTP): {code}\n")
+    return {"message": f"OTP sent to user's mobile number: {phone}"}
+
+@api.delete("/auth/users/{user_id}")
+async def delete_user(user_id: int, otp: str = Query(...), manager: dict = Depends(require_role("manager"))):
+    stored = DELETE_OTP_STORE.get(user_id)
+    if not stored:
+        raise HTTPException(400, "No active OTP request for deletion.")
+    if dt.datetime.utcnow() > stored["expires"]:
+        del DELETE_OTP_STORE[user_id]
+        raise HTTPException(400, "OTP expired.")
+    if otp != stored["otp"]:
+        raise HTTPException(400, "Invalid OTP.")
+    
+    res = await db.Users.delete_one({"UserID": user_id})
+    if res.deleted_count == 0:
+        raise HTTPException(404, "User not found")
+    del DELETE_OTP_STORE[user_id]
+    return {"message": "User deleted successfully."}
+
 @api.post("/auth/request-otp")
 async def request_otp(req: OTPRequest, user: dict = Depends(get_current_user)):
     existing = await db.Users.find_one({"Username": req.new_username})
     if existing and existing["UserID"] != user["UserID"]:
         raise HTTPException(409, "Username is already taken.")
+    
+    phone = user.get("Phone")
+    if not phone:
+        raise HTTPException(400, "Your account has no phone number. Please contact the manager.")
     
     code = str(random.randint(100000, 999999))
     OTP_STORE[user["UserID"]] = {
@@ -367,8 +413,9 @@ async def request_otp(req: OTPRequest, user: dict = Depends(get_current_user)):
         "expires": dt.datetime.utcnow() + dt.timedelta(minutes=10),
         "new_username": req.new_username
     }
-    print(f"OTP for user {user['UserID']} ({user['Username']}): {code}")
-    return {"message": "OTP sent to your registered mobile/email."}
+    # Simulate sending SMS
+    print(f"\n[SMS SENT TO {phone}] (Change Credentials OTP): {code}\n")
+    return {"message": f"OTP sent to your registered mobile number: {phone}"}
 
 
 @api.post("/auth/change-credentials")

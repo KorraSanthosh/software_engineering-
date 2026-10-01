@@ -96,11 +96,11 @@ async def seed_users(db) -> None:
         return
     
     defaults = [
-        {"UserID": 1, "Username": "manager", "PasswordHash": hash_password("admin123"), "Role": "manager", "LinkedID": None, "DisplayName": "Agency Manager", "CreatedAt": dt.datetime.utcnow()},
-        {"UserID": 2, "Username": "delivery1", "PasswordHash": hash_password("deliver123"), "Role": "delivery_staff", "LinkedID": 1, "DisplayName": "Delivery Person 1", "CreatedAt": dt.datetime.utcnow()},
-        {"UserID": 3, "Username": "delivery2", "PasswordHash": hash_password("deliver123"), "Role": "delivery_staff", "LinkedID": 2, "DisplayName": "Delivery Person 2", "CreatedAt": dt.datetime.utcnow()},
-        {"UserID": 4, "Username": "customer1", "PasswordHash": hash_password("customer123"), "Role": "customer", "LinkedID": 1, "DisplayName": "Customer 1", "CreatedAt": dt.datetime.utcnow()},
-        {"UserID": 5, "Username": "customer2", "PasswordHash": hash_password("customer123"), "Role": "customer", "LinkedID": 2, "DisplayName": "Customer 2", "CreatedAt": dt.datetime.utcnow()},
+        {"UserID": 1, "Username": "manager", "PasswordHash": hash_password("admin123"), "Role": "manager", "LinkedID": None, "DisplayName": "Agency Manager", "Phone": "9999999999", "CreatedAt": dt.datetime.utcnow()},
+        {"UserID": 2, "Username": "delivery1", "PasswordHash": hash_password("deliver123"), "Role": "delivery_staff", "LinkedID": 1, "DisplayName": "Delivery Person 1", "Phone": "9876543210", "CreatedAt": dt.datetime.utcnow()},
+        {"UserID": 3, "Username": "delivery2", "PasswordHash": hash_password("deliver123"), "Role": "delivery_staff", "LinkedID": 2, "DisplayName": "Delivery Person 2", "Phone": "9876543211", "CreatedAt": dt.datetime.utcnow()},
+        {"UserID": 4, "Username": "customer1", "PasswordHash": hash_password("customer123"), "Role": "customer", "LinkedID": 1, "DisplayName": "Customer 1", "Phone": "9876543212", "CreatedAt": dt.datetime.utcnow()},
+        {"UserID": 5, "Username": "customer2", "PasswordHash": hash_password("customer123"), "Role": "customer", "LinkedID": 2, "DisplayName": "Customer 2", "Phone": "9876543213", "CreatedAt": dt.datetime.utcnow()},
     ]
     await db.Users.insert_many(defaults)
     await db.Users.create_index("Username", unique=True)
