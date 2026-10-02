@@ -24,7 +24,9 @@ export default function Login() {
       const userRole = (user.Role || '').toLowerCase()
       const expectedRole = selectedRole.toLowerCase()
       if (userRole !== expectedRole) {
-        throw new Error(`Invalid role. This account is not a ${expectedRole.replace('_', ' ')}.`)
+        const roleNames = { manager: 'manager', delivery_staff: 'delivery staff', customer: 'customer' }
+        const friendly = roleNames[expectedRole] || expectedRole
+        throw new Error(`No ${friendly} with this username.`)
       }
       if (userRole === 'manager') navigate('/', { replace: true })
       else if (userRole === 'delivery_staff') navigate('/my-deliveries', { replace: true })
