@@ -10,6 +10,8 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: "3.12.0"
+      - key: CORS_ORIGINS
+        value: "*"
       - key: MONGO_URL
         # We set sync to false so Render will prompt you for this secure credential in the dashboard!
         sync: false
