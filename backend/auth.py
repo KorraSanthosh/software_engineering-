@@ -70,7 +70,8 @@ async def get_current_user(token: Optional[str] = Depends(oauth2_scheme)) -> dic
         raise HTTPException(status_code=401, detail="Invalid token payload")
     
     from main import db as main_db
-    user = await main_db.Users.find_one({"Username": username})
+    import re
+    user = await main_db.Users.find_one({"Username": {"$regex": f"^{re.escape(username)}$", "$options": "i"}})
     if user is None:
         raise HTTPException(status_code=401, detail="User not found")
     

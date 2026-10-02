@@ -71,10 +71,13 @@ async def lifespan(_app):
 
 app = FastAPI(title="Newspaper Agency Automation API", version="2.0.0", lifespan=lifespan)
 
+_raw_origins = [o.strip() for o in os.getenv("CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173").split(",") if o.strip()]
+_allow_all_origins = "*" in _raw_origins
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[o.strip() for o in os.getenv("CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173").split(",") if o.strip()],
-    allow_credentials=True,
+    allow_origins=["*"] if _allow_all_origins else _raw_origins,
+    allow_credentials=False if _allow_all_origins else True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -285,8 +288,19 @@ async def health():
 # ===========================================================================
 @api.post("/auth/login")
 async def login(creds: LoginRequest):
-    user = await db.Users.find_one({"Username": creds.username})
-    if not user or not verify_password(creds.password, user["PasswordHash"]):
+    # Case-insensitive username lookup using a regex match
+    import re
+    user = await db.Users.find_one({"Username": {"$regex": f"^{re.escape(creds.username)}$", "$options": "i"}})
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+
+    stored_hash = user["PasswordHash"]
+    # Normalize bcrypt hash prefix: some libraries store $2y$ instead of $2b$
+    # passlib expects $2b$, so we normalise before verifying
+    if stored_hash.startswith("$2y$"):
+        stored_hash = "$2b$" + stored_hash[4:]
+
+    if not verify_password(creds.password, stored_hash):
         raise HTTPException(status_code=401, detail="Invalid username or password")
     
     token = create_access_token({
