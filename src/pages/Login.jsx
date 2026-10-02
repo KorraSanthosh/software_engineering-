@@ -6,7 +6,7 @@ import Icon from '../components/Icon'
 import { VintageFlourish } from '../components/Ornaments'
 
 export default function Login() {
-  const { login, loading } = useAuth()
+  const { login, logout, loading } = useAuth()
   const navigate = useNavigate()
   const [selectedRole, setSelectedRole] = useState(null)
   const [username, setUsername] = useState('')
@@ -24,9 +24,11 @@ export default function Login() {
       const userRole = (user.Role || '').toLowerCase()
       const expectedRole = selectedRole.toLowerCase()
       if (userRole !== expectedRole) {
-        const roleNames = { manager: 'manager', delivery_staff: 'delivery staff', customer: 'customer' }
-        const friendly = roleNames[expectedRole] || expectedRole
-        throw new Error(`No ${friendly} with this username.`)
+        // Clear stored auth before showing mismatch error
+        logout();
+        const roleNames = { manager: 'manager', delivery_staff: 'delivery staff', customer: 'customer' };
+        const friendly = roleNames[expectedRole] || expectedRole;
+        throw new Error(`No ${friendly} with this username.`);
       }
       if (userRole === 'manager') navigate('/', { replace: true })
       else if (userRole === 'delivery_staff') navigate('/my-deliveries', { replace: true })
