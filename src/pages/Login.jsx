@@ -18,12 +18,17 @@ export default function Login() {
     setError('')
     try {
       const user = await login(username, password)
-      if (user.Role !== selectedRole) {
-        throw new Error(`Invalid role. This account is not a ${selectedRole.replace('_', ' ')}.`)
+      if (!selectedRole) {
+        throw new Error('Please select a role before signing in.')
       }
-      if (user.Role === 'manager') navigate('/', { replace: true })
-      else if (user.Role === 'delivery_staff') navigate('/my-deliveries', { replace: true })
-      else if (user.Role === 'customer') navigate('/my-account', { replace: true })
+      const userRole = (user.Role || '').toLowerCase()
+      const expectedRole = selectedRole.toLowerCase()
+      if (userRole !== expectedRole) {
+        throw new Error(`Invalid role. This account is not a ${expectedRole.replace('_', ' ')}.`)
+      }
+      if (userRole === 'manager') navigate('/', { replace: true })
+      else if (userRole === 'delivery_staff') navigate('/my-deliveries', { replace: true })
+      else if (userRole === 'customer') navigate('/my-account', { replace: true })
       else navigate('/', { replace: true })
     } catch (err) {
       setError(err.message || 'Login failed')

@@ -1,5 +1,5 @@
 // Branding — override with VITE_AGENCY_NAME / VITE_AGENCY_TAGLINE / VITE_AGENCY_CITY in .env
-export const AGENCY_NAME = import.meta.env.VITE_AGENCY_NAME || 'The Newspaper Agency'
+export const AGENCY_NAME = import.meta.env.VITE_AGENCY_NAME || 'The Daily Chronicle'
 export const AGENCY_TAGLINE = import.meta.env.VITE_AGENCY_TAGLINE || 'Circulation · Delivery · Billing'
 export const AGENCY_CITY = import.meta.env.VITE_AGENCY_CITY || 'City Edition'
 

@@ -43,7 +43,9 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(false)
 
   const login = useCallback(async (username, password) => {
-    setLoading(true)
+    // Clear any existing auth state before new login
+    logout();
+    setLoading(true);
     try {
       const data = await authRequest('/auth/login', {
         method: 'POST',
