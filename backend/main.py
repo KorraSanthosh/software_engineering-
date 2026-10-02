@@ -288,9 +288,8 @@ async def health():
 # ===========================================================================
 @api.post("/auth/login")
 async def login(creds: LoginRequest):
-    # Case-insensitive username lookup using a regex match
-    import re
-    user = await db.Users.find_one({"Username": {"$regex": f"^{re.escape(creds.username)}$", "$options": "i"}})
+    # Exact case-sensitive username lookup
+    user = await db.Users.find_one({"Username": creds.username})
     if not user:
         raise HTTPException(status_code=401, detail="Invalid username or password")
 
