@@ -251,6 +251,7 @@ export default function RoutesAndStaff() {
                 initialSort={{ key: 'Name', dir: 'asc' }}
                 empty={<Empty title="No delivery staff yet">Add someone before creating zones.</Empty>}
                 columns={[
+                  { key: 'DeliveryPersonID', label: 'ID', render: (r) => <span className="mono muted">#{r.DeliveryPersonID}</span> },
                   { key: 'Name', label: 'Name', render: (r) => <span className="strong">{r.Name}</span> },
                   { key: 'ContactNumber', label: 'Phone', render: (r) => <a className="mono" href={`tel:${r.ContactNumber}`}>{r.ContactNumber}</a> },
                   { key: 'CommissionRate', label: 'Rate', align: 'right', render: (r) => <span className="num">{pctOf(r.CommissionRate)}</span> },
