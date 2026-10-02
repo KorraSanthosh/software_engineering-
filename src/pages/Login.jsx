@@ -16,6 +16,19 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    // client‑side validation
+    if (!username) {
+      setError('Username is required')
+      return
+    }
+    if (!password) {
+      setError('Password is required')
+      return
+    }
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters')
+      return
+    }
     try {
       const user = await login(username, password)
       if (!selectedRole) {
@@ -26,9 +39,10 @@ export default function Login() {
       if (userRole !== expectedRole) {
         // Clear stored auth before showing mismatch error
         logout();
-        const roleNames = { manager: 'manager', delivery_staff: 'delivery staff', customer: 'customer' };
+        const roleNames = { manager: 'Manager', delivery_staff: 'Delivery Staff', customer: 'Customer' };
         const friendly = roleNames[expectedRole] || expectedRole;
-        throw new Error(`No ${friendly} with this username.`);
+        const actualFriendly = roleNames[userRole] || userRole;
+        throw new Error(`This account is registered as "${actualFriendly}", not "${friendly}". Please select the correct role.`);
       }
       if (userRole === 'manager') navigate('/', { replace: true })
       else if (userRole === 'delivery_staff') navigate('/my-deliveries', { replace: true })
