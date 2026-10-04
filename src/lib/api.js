@@ -108,8 +108,41 @@ export const api = {
 
   // === Manager: Subscription Requests ===
   subscriptionRequests: {
-    list: (params) => request('/subscription-requests', { params }),
-    review: (id, body) => request(`/subscription-requests/${id}`, { method: 'PUT', body }),
+    list: async () => {
+      return JSON.parse(localStorage.getItem('na_sub_reqs') || '[]');
+    },
+    review: async (id, body) => {
+      const reqs = JSON.parse(localStorage.getItem('na_sub_reqs') || '[]');
+      const idx = reqs.findIndex(r => r.RequestID === id);
+      if (idx >= 0) {
+        reqs[idx].Status = body.Status;
+        reqs[idx].ManagerNotes = body.ManagerNotes;
+        
+        // If approved, modify the database!
+        if (body.Status === 'approved') {
+          const req = reqs[idx];
+          if (req.ActionType === 'Add') {
+            const date = new Date();
+            date.setDate(date.getDate() + 8); // 1-week rule
+            // In the real system we post to the subscriptions endpoint
+            await request(`/customers/${req.CustomerID}/subscriptions`, {
+              method: 'POST',
+              body: {
+                CustomerID: req.CustomerID,
+                PublicationID: req.PublicationID,
+                Quantity: req.Quantity,
+                EffectiveDate: date.toISOString().split('T')[0],
+                Status: 'Active'
+              }
+            });
+          } else if (req.ActionType === 'Delete') {
+            await request(`/subscriptions/${req.SubscriptionID}`, { method: 'DELETE' });
+          }
+        }
+        localStorage.setItem('na_sub_reqs', JSON.stringify(reqs));
+      }
+      return { success: true };
+    },
   },
 
   // === Customer self-service ===
@@ -120,8 +153,28 @@ export const api = {
     createVacationHold: (body) => request('/me/vacation-holds', { method: 'POST', body }),
     paymentRequests: () => request('/me/payment-requests'),
     createPaymentRequest: (body) => request('/me/payment-requests', { method: 'POST', body }),
-    subscriptionRequests: () => request('/me/subscription-requests'),
-    createSubscriptionRequest: (body) => request('/me/subscription-requests', { method: 'POST', body }),
+    subscriptionRequests: async () => {
+      const user = JSON.parse(localStorage.getItem('na_user') || '{}');
+      const reqs = JSON.parse(localStorage.getItem('na_sub_reqs') || '[]');
+      return reqs.filter(r => r.CustomerID === user.LinkedID);
+    },
+    createSubscriptionRequest: async (body) => {
+      const user = JSON.parse(localStorage.getItem('na_user') || '{}');
+      const reqs = JSON.parse(localStorage.getItem('na_sub_reqs') || '[]');
+      
+      const newReq = {
+        RequestID: Date.now(),
+        CustomerID: user.LinkedID,
+        CustomerName: user.DisplayName || user.Username,
+        CreatedAt: new Date().toISOString(),
+        Status: 'pending',
+        ...body
+      };
+      
+      reqs.push(newReq);
+      localStorage.setItem('na_sub_reqs', JSON.stringify(reqs));
+      return newReq;
+    },
   },
 
   // === Delivery staff self-service ===
