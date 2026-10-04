@@ -20,6 +20,26 @@ export default function CustomerPortal() {
   const customer = overdue?.customer
   const totalOverdue = overdue?.total_overdue || 0
   const activeSubs = (subs || []).filter(s => s.Status === 'Active')
+  
+  // Group by publication to hide old superseded subscriptions
+  const pubGroups = {}
+  activeSubs.forEach(s => {
+    if (!pubGroups[s.PublicationID]) pubGroups[s.PublicationID] = []
+    pubGroups[s.PublicationID].push(s)
+  })
+  
+  const displaySubs = []
+  Object.values(pubGroups).forEach(group => {
+    group.sort((a, b) => new Date(b.EffectiveDate) - new Date(a.EffectiveDate))
+    const now = new Date()
+    // Find the latest effective one that has already started
+    const current = group.find(s => new Date(s.EffectiveDate) <= now)
+    // Find any future ones
+    const futures = group.filter(s => new Date(s.EffectiveDate) > now)
+    if (current) displaySubs.push(current)
+    displaySubs.push(...futures)
+  })
+
   const activeHolds = (holds || []).filter(h => {
     const now = new Date().toISOString().slice(0, 10)
     return h.EndDate >= now
@@ -51,7 +71,7 @@ export default function CustomerPortal() {
 
         <div className="stat">
           <Icon name="repeat" size={18} />
-          <span className="stat-value">{activeSubs.length}</span>
+          <span className="stat-value">{displaySubs.filter(s => new Date(s.EffectiveDate) <= new Date()).length}</span>
           <span className="stat-label">Active Subscriptions</span>
         </div>
 
@@ -81,10 +101,10 @@ export default function CustomerPortal() {
         <div className="panel">
           <EditorialBoxHeader title="My Subscriptions" />
           <div style={{padding: '1rem'}}>
-            {activeSubs.length === 0 ? (
+            {displaySubs.length === 0 ? (
               <p style={{color: 'var(--ink-3)', fontSize: '0.85rem'}}>No active subscriptions.</p>
             ) : (
-              activeSubs.map(s => {
+              displaySubs.map(s => {
                 const isFuture = s.EffectiveDate && new Date(s.EffectiveDate) > new Date();
                 return (
                   <div key={s.SubscriptionID} style={{display: 'flex', flexDirection: 'column', padding: '0.4rem 0', borderBottom: '1px solid var(--rule)'}}>

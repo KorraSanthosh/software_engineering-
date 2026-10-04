@@ -124,19 +124,49 @@ export const api = {
           if (req.ActionType === 'Add') {
             const date = new Date();
             date.setDate(date.getDate() + 8); // 1-week rule
+            
+            // Get current subscriptions to check if they already have this publication
+            const custSubs = await request('/subscriptions', { params: { customer_id: req.CustomerID } });
+            const currentSub = custSubs
+              .filter(s => s.PublicationID === req.PublicationID && s.Status === 'Active')
+              .sort((a, b) => new Date(b.EffectiveDate) - new Date(a.EffectiveDate))[0];
+              
+            const newQuantity = currentSub ? Number(currentSub.Quantity) + Number(req.Quantity) : Number(req.Quantity);
+
             // In the real system we post to the subscriptions endpoint
             await request(`/customers/${req.CustomerID}/subscriptions`, {
               method: 'POST',
               body: {
                 CustomerID: req.CustomerID,
                 PublicationID: req.PublicationID,
-                Quantity: req.Quantity,
+                Quantity: newQuantity,
                 EffectiveDate: date.toISOString().split('T')[0],
                 Status: 'Active'
               }
             });
           } else if (req.ActionType === 'Delete') {
-            await request(`/subscriptions/${req.SubscriptionID}`, { method: 'DELETE' });
+            // For delete, they request to remove N copies. We should update the quantity or cancel it.
+            const custSubs = await request('/subscriptions', { params: { customer_id: req.CustomerID } });
+            const currentSub = custSubs.find(s => s.SubscriptionID === req.SubscriptionID);
+            if (currentSub) {
+              const remaining = Number(currentSub.Quantity) - Number(req.Quantity);
+              if (remaining > 0) {
+                const date = new Date();
+                date.setDate(date.getDate() + 8);
+                await request(`/customers/${req.CustomerID}/subscriptions`, {
+                  method: 'POST',
+                  body: {
+                    CustomerID: req.CustomerID,
+                    PublicationID: req.PublicationID,
+                    Quantity: remaining,
+                    EffectiveDate: date.toISOString().split('T')[0],
+                    Status: 'Active'
+                  }
+                });
+              } else {
+                await request(`/subscriptions/${req.SubscriptionID}`, { method: 'DELETE' });
+              }
+            }
           }
         }
         localStorage.setItem('na_sub_reqs', JSON.stringify(reqs));
