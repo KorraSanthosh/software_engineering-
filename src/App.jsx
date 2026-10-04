@@ -29,12 +29,15 @@ import CustomerPortal from './pages/customer/CustomerPortal'
 import MyOverdue from './pages/customer/MyOverdue'
 import MyVacationHolds from './pages/customer/MyVacationHolds'
 import MyPaymentRequests from './pages/customer/MyPaymentRequests'
+import MySubscriptionRequests from './pages/customer/MySubscriptionRequests'
+import SubscriptionRequests from './pages/manager/SubscriptionRequests'
 import Settings from './pages/Settings'
 
 const MANAGER_SECTIONS = [
   { to: '/', label: 'Front Page', icon: 'front', end: true },
   { to: '/customers', label: 'Customers', icon: 'users' },
   { to: '/subscriptions', label: 'Subscriptions', icon: 'repeat' },
+  { to: '/subscription-requests', label: 'Sub Requests', icon: 'repeat' },
   { to: '/publications', label: 'Publications', icon: 'paper' },
   { to: '/vacation-holds', label: 'Vacation Holds', icon: 'pause' },
   { to: '/deliveries', label: 'Daily Deliveries', icon: 'truck' },
@@ -51,6 +54,7 @@ const DELIVERY_SECTIONS = [
 
 const CUSTOMER_SECTIONS = [
   { to: '/my-account', label: 'My Account', icon: 'front', end: true },
+  { to: '/my-account/subscriptions', label: 'My Sub Requests', icon: 'repeat' },
   { to: '/my-account/overdue', label: 'My Overdue', icon: 'receipt' },
   { to: '/my-account/vacation-holds', label: 'Vacation Holds', icon: 'pause' },
   { to: '/my-account/payment-requests', label: 'Payment Requests', icon: 'wallet' },
@@ -166,6 +170,7 @@ function AppShell() {
             <Route path="/" element={<ProtectedRoute roles={['manager']}><Dashboard /></ProtectedRoute>} />
             <Route path="/customers" element={<ProtectedRoute roles={['manager']}><Customers /></ProtectedRoute>} />
             <Route path="/subscriptions" element={<ProtectedRoute roles={['manager']}><Subscriptions /></ProtectedRoute>} />
+            <Route path="/subscription-requests" element={<ProtectedRoute roles={['manager']}><SubscriptionRequests /></ProtectedRoute>} />
             <Route path="/publications" element={<ProtectedRoute roles={['manager']}><Publications /></ProtectedRoute>} />
             <Route path="/vacation-holds" element={<ProtectedRoute roles={['manager']}><VacationHolds /></ProtectedRoute>} />
             <Route path="/deliveries" element={<ProtectedRoute roles={['manager']}><Deliveries /></ProtectedRoute>} />
@@ -180,6 +185,7 @@ function AppShell() {
 
             {/* Customer routes */}
             <Route path="/my-account" element={<ProtectedRoute roles={['customer']}><CustomerPortal /></ProtectedRoute>} />
+            <Route path="/my-account/subscriptions" element={<ProtectedRoute roles={['customer']}><MySubscriptionRequests /></ProtectedRoute>} />
             <Route path="/my-account/overdue" element={<ProtectedRoute roles={['customer']}><MyOverdue /></ProtectedRoute>} />
             <Route path="/my-account/vacation-holds" element={<ProtectedRoute roles={['customer']}><MyVacationHolds /></ProtectedRoute>} />
             <Route path="/my-account/payment-requests" element={<ProtectedRoute roles={['customer']}><MyPaymentRequests /></ProtectedRoute>} />

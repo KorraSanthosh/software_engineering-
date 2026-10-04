@@ -106,6 +106,12 @@ export const api = {
     summary: (year, month) => request('/reports/agency-summary', { params: { year, month } }),
   },
 
+  // === Manager: Subscription Requests ===
+  subscriptionRequests: {
+    list: (params) => request('/subscription-requests', { params }),
+    review: (id, body) => request(`/subscription-requests/${id}`, { method: 'PUT', body }),
+  },
+
   // === Customer self-service ===
   me: {
     overdue: () => request('/me/overdue'),
@@ -114,6 +120,8 @@ export const api = {
     createVacationHold: (body) => request('/me/vacation-holds', { method: 'POST', body }),
     paymentRequests: () => request('/me/payment-requests'),
     createPaymentRequest: (body) => request('/me/payment-requests', { method: 'POST', body }),
+    subscriptionRequests: () => request('/me/subscription-requests'),
+    createSubscriptionRequest: (body) => request('/me/subscription-requests', { method: 'POST', body }),
   },
 
   // === Delivery staff self-service ===
