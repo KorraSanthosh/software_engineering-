@@ -148,11 +148,14 @@ export default function MySubscriptionRequests() {
             <Field label="Current Subscription">
               <select className="input" required value={subId} onChange={e => setSubId(e.target.value)}>
                 <option value="" disabled>Select subscription to remove</option>
-                {activeSubs.map(s => (
-                  <option key={s.SubscriptionID} value={s.SubscriptionID}>
-                    {s.PublicationName || `Pub #${s.PublicationID}`} (Qty: {s.Quantity})
-                  </option>
-                ))}
+                {activeSubs.map(s => {
+                  const isFuture = s.EffectiveDate && new Date(s.EffectiveDate) > new Date();
+                  return (
+                    <option key={s.SubscriptionID} value={s.SubscriptionID}>
+                      {s.PublicationName || `Pub #${s.PublicationID}`} (Qty: {s.Quantity}) {isFuture ? '- Upcoming' : ''}
+                    </option>
+                  )
+                })}
               </select>
             </Field>
             <Field label="Quantity to Remove">

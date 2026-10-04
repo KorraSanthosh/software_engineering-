@@ -84,12 +84,22 @@ export default function CustomerPortal() {
             {activeSubs.length === 0 ? (
               <p style={{color: 'var(--ink-3)', fontSize: '0.85rem'}}>No active subscriptions.</p>
             ) : (
-              activeSubs.map(s => (
-                <div key={s.SubscriptionID} style={{display: 'flex', justifyContent: 'space-between', padding: '0.4rem 0', borderBottom: '1px solid var(--rule)'}}>
-                  <span style={{fontWeight: 600}}>{s.PublicationName || `Pub #${s.PublicationID}`}</span>
-                  <span style={{fontFamily: 'var(--font-mono)', fontSize: '0.85rem'}}>×{s.Quantity} · {money(s.PricePerIssue)}/issue</span>
-                </div>
-              ))
+              activeSubs.map(s => {
+                const isFuture = s.EffectiveDate && new Date(s.EffectiveDate) > new Date();
+                return (
+                  <div key={s.SubscriptionID} style={{display: 'flex', flexDirection: 'column', padding: '0.4rem 0', borderBottom: '1px solid var(--rule)'}}>
+                    <div style={{display: 'flex', justifyContent: 'space-between'}}>
+                      <span style={{fontWeight: 600}}>{s.PublicationName || `Pub #${s.PublicationID}`}</span>
+                      <span style={{fontFamily: 'var(--font-mono)', fontSize: '0.85rem'}}>×{s.Quantity} · {money(s.PricePerIssue)}/issue</span>
+                    </div>
+                    {isFuture && (
+                      <span style={{fontSize: '0.8rem', color: 'var(--amber)', marginTop: '0.2rem'}}>
+                        Will come into action on {new Date(s.EffectiveDate).toLocaleDateString()}
+                      </span>
+                    )}
+                  </div>
+                )
+              })
             )}
           </div>
         </div>
